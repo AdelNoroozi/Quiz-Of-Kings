@@ -24,12 +24,22 @@ class UserManager(BaseUserManager):
         user = self.create_user(username=username)
         user.password = make_password(password)
         user.is_staff = True
-        user.is_superuser= True
+        user.is_superuser = True
         user.save(using=self.db)
 
         return user
 
 
 class User(AbstractUser):
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = []
+
+    objects = UserManager()
+
     def __str__(self):
         return self.username
+
+    class Meta:
+        verbose_name = _('User')
+        verbose_name_plural = _('Users')
+        db_table = 'User'
