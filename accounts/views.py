@@ -1,4 +1,5 @@
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.password_validation import validate_password
 from django.shortcuts import render
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
@@ -60,6 +61,8 @@ class ChangePasswordView(UpdateAPIView):
         confirm_password = request.data['confirm_password']
 
         if user.check_password(current_password):
+            validate_password(new_password)
+
             if current_password != new_password:
                 if new_password == confirm_password:
                     user.password = make_password(new_password)
