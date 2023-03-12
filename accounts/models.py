@@ -7,8 +7,8 @@ from django.db import models
 
 class UserManager(BaseUserManager):
     def create_user(self, username, is_active=True, is_staff=False, password=None):
-        if not password:
-            raise ValueError('password is required')
+        # if not password:
+        #     raise ValueError('password is required')
         if not username:
             raise ValueError('username is required')
 

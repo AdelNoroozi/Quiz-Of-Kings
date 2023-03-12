@@ -30,6 +30,15 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
         return attrs
 
+    @staticmethod
+    def clean_validated_data(validate_data):
+        validate_data.pop('confirm_password')
+        return validate_data
+
+    def create(self, validated_data):
+        user = self.Meta.model.objects.create_user(**self.clean_validated_data(validated_data))
+        return user
+
 
 class ChangeUserSerializer(serializers.ModelSerializer):
     current_password = serializers.CharField(
