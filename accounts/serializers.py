@@ -40,7 +40,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return user
 
 
-class ChangeUserSerializer(serializers.ModelSerializer):
+class ChangePasswordSerializer(serializers.ModelSerializer):
     current_password = serializers.CharField(
         write_only=True,
         required=True,
@@ -70,16 +70,16 @@ class ChangeUserSerializer(serializers.ModelSerializer):
 
         return attrs
 
-    def update(self, instance, validated_data):
-        if instance.check_passwrod(validated_data.get('current_password')):
-            instance.password = make_password(validated_data.get('new_password'))
-            instance.save()
-            return instance
-        return serializers.ValidationError(_('password is incorrect'))
-
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'date_joined', 'is_active')
         read_only_fields = ('id', 'date_joined', 'is_active')
+
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'is_staff', 'is_superuser', 'is_active')
+        read_only_fields = ('id', 'is_superuser', 'is_staff', 'is_active')
