@@ -20,6 +20,17 @@ class StartMatchView(APIView):
     pass
 
 
+class MatchViewSet(mixins.RetrieveModelMixin,
+                   mixins.DestroyModelMixin,
+                   mixins.ListModelMixin,
+                   GenericViewSet):
+    pass
+
+
+class QuitMatchView(APIView):
+    pass
+
+
 class CategoryViewSet(viewsets.ModelViewSet):
     pass
 
