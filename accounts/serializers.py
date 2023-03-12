@@ -3,7 +3,7 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
-from accounts.models import User
+from accounts.models import User, Profile
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -37,6 +37,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.Meta.model.objects.create_user(**self.clean_validated_data(validated_data))
+        Profile.objects.create(user=user)
         return user
 
 
@@ -63,19 +64,19 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
         model = User
         fields = ('current_password', 'new_password', 'confirm_password')
 
-    def validate(self, attrs):
-        validate_password(attrs.get('new_password'))
-        if attrs.get('new_password') != attrs.get('confirm_password'):
-            raise serializers.ValidationError(_('password and  confirm password do not match'))
-
-        return attrs
+    # def validate(self, attrs):
+    #     validate_password(attrs.get('new_password'))
+    #     if attrs.get('new_password') != attrs.get('confirm_password'):
+    #         raise serializers.ValidationError(_('password and  confirm password do not match'))
+    #
+    #     return attrs
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'date_joined', 'is_active')
-        read_only_fields = ('id', 'date_joined', 'is_active')
+        fields = ('id', 'username', 'is_active')
+        read_only_fields = ('id', 'is_active')
 
 
 class UserFullSerializer(serializers.ModelSerializer):
@@ -90,3 +91,12 @@ class UserInfoSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'is_staff', 'is_superuser', 'is_active')
         read_only_fields = ('id', 'is_superuser', 'is_staff', 'is_active')
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = ('id', 'user', 'point', 'coin')
+        read_only_fields = ('id',)
