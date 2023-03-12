@@ -75,8 +75,8 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'date_joined', 'is_active')
-        read_only_fields = ('id', 'date_joined', 'is_active')
+        fields = ('id', 'username', 'is_active')
+        read_only_fields = ('id', 'is_active')
 
 
 class UserFullSerializer(serializers.ModelSerializer):
@@ -91,3 +91,12 @@ class UserInfoSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'is_staff', 'is_superuser', 'is_active')
         read_only_fields = ('id', 'is_superuser', 'is_staff', 'is_active')
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = ('id', 'user', 'point', 'coin')
+        read_only_fields = ('id',)
