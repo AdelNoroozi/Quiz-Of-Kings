@@ -43,3 +43,15 @@ class User(AbstractUser):
         verbose_name = _('User')
         verbose_name_plural = _('Users')
         db_table = 'User'
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile', verbose_name=_('user'))
+    avatar = models.ImageField(upload_to='images/', verbose_name=_('avatar'), default='images/Default.jpg')
+    point = models.PositiveIntegerField(verbose_name=_('point'), default=0)
+    coin = models.PositiveIntegerField(verbose_name=_('coin'), default=0)
+
+    def __str__(self):
+        return self.user
+
+
