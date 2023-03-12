@@ -26,7 +26,7 @@ class UserView(RetrieveAPIView):
 
 class UserInfoView(RetrieveAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserInfoSerializer
 
     def get_object(self):
         if self.request.user.is_authenticated:
@@ -57,13 +57,18 @@ class ChangePasswordView(UpdateAPIView):
         user = self.get_object()
         current_password = request.data['current_password']
         new_password = request.data['new_password']
+        confirm_password = request.data['confirm_password']
 
         if user.check_password(current_password):
             if current_password != new_password:
-                user.password = make_password(new_password)
-                user.save()
+                if new_password == confirm_password:
+                    user.password = make_password(new_password)
+                    user.save()
 
-                response = {'detail': 'password changed successfully'}
+                    response = {'detail': 'password changed successfully'}
+                    return Response(response)
+
+                response = {'detail': 'password and  confirm password do not match'}
                 return Response(response)
 
             response = {'detail': 'enter different password from your current one!'}

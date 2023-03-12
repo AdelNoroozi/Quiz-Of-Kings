@@ -63,12 +63,12 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
         model = User
         fields = ('current_password', 'new_password', 'confirm_password')
 
-    def validate(self, attrs):
-        validate_password(attrs.get('new_password'))
-        if attrs.get('new_password') != attrs.get('confirm_password'):
-            raise serializers.ValidationError(_('password and  confirm password do not match'))
-
-        return attrs
+    # def validate(self, attrs):
+    #     validate_password(attrs.get('new_password'))
+    #     if attrs.get('new_password') != attrs.get('confirm_password'):
+    #         raise serializers.ValidationError(_('password and  confirm password do not match'))
+    #
+    #     return attrs
 
 
 class UserSerializer(serializers.ModelSerializer):
