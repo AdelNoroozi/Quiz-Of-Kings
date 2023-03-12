@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from game.models import *
+
+admin.site.register(Category)
+admin.site.register(Question)
