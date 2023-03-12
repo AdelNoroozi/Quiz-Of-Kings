@@ -50,6 +50,7 @@ class Player(models.Model):
     avatar = models.ImageField(upload_to='images/', verbose_name=_('avatar'), default='images/Default.jpg')
     point = models.PositiveIntegerField(verbose_name=_('point'), default=0)
     coin = models.PositiveIntegerField(verbose_name=_('coin'), default=0)
+    reported_times = models.IntegerField(default=0, verbose_name=_('reported times'))
 
     def __str__(self):
         return self.user.username

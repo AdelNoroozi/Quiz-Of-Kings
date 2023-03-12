@@ -12,6 +12,10 @@ def join_match():
     pass
 
 
+def reduce_coin():
+    pass
+
+
 class StartMatchView(APIView):
     pass
 
@@ -43,19 +47,23 @@ class AnswerQuestionView(APIView):
     pass
 
 
+class FinishMatch(APIView):
+    pass
+
+
 class PlayerAnswerViewSet(mixins.CreateModelMixin,
                           mixins.RetrieveModelMixin,
                           GenericViewSet):
     pass
 
 
-def remove_incorrect_choices():
+def remove_incorrect_choices_help():
     pass
 
 
-def popular_choices():
+def popular_choices_help():
     pass
 
 
-def second_chance():
+def second_chance_help():
     pass

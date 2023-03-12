@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # internal apps
     'accounts',
     'game',
+    'feedback',
 ]
 
 MIDDLEWARE = [

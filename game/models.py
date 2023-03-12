@@ -1,3 +1,4 @@
+from django.core.validators import MaxValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -20,7 +21,7 @@ class Question(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='questions',
                                  verbose_name=_('category'))
     text = models.TextField(verbose_name=_('question text'))
-    answered_count = models.IntegerField(default=0, verbose_name=_('answered count'))
+    answered_count = models.PositiveIntegerField(default=0, verbose_name=_('answered count'))
     created_by = models.ForeignKey(Player, on_delete=models.PROTECT, related_name='questions',
                                    verbose_name=_('creator'),
                                    blank=True, null=True)
@@ -29,6 +30,8 @@ class Question(models.Model):
                                      blank=True, null=True)
     created_at = models.DateField(auto_now_add=True, verbose_name=_('creation date'))
     confirmed_at = models.DateField(verbose_name=_('confirmation date'), blank=True, null=True)
+    likes = models.PositiveIntegerField(default=0, verbose_name=_('likes'))
+    dislikes = models.PositiveIntegerField(default=0, verbose_name=_('dislikes'))
 
     class Meta:
         verbose_name = _('Question')
@@ -41,7 +44,7 @@ class Question(models.Model):
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='choices', verbose_name=_('question'))
     text = models.TextField(verbose_name=_('choice text'))
-    chosen_count = models.IntegerField(default=0, verbose_name=_('chosen count'))
+    chosen_count = models.PositiveIntegerField(default=0, verbose_name=_('chosen count'))
     is_correct = models.BooleanField(default=False, verbose_name=_('is correct'))
 
     class Meta:
@@ -62,14 +65,15 @@ class Match(models.Model):
                                        verbose_name=_('starter player'))
     joining_player = models.ForeignKey(Player, on_delete=models.PROTECT, related_name='player_matches_as_joiner',
                                        verbose_name=_('joining player'), blank=True, null=True)
-    starter_player_score = models.IntegerField(default=0, verbose_name=_('starter player score'))
-    joining_player_score = models.IntegerField(default=0, verbose_name=_('joining player score'))
+    starter_player_score = models.PositiveIntegerField(default=0, verbose_name=_('starter player score'))
+    joining_player_score = models.PositiveIntegerField(default=0, verbose_name=_('joining player score'))
     selected_categories = models.ManyToManyField(Category, verbose_name=_('selected categories'))
     status = models.CharField(max_length=15, choices=STATUSES, verbose_name=_('status'))
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('creation time'))
-    modificated_at = models.DateTimeField(verbose_name=_('last modification'), blank=True, null=True)
+    modified_at = models.DateTimeField(verbose_name=_('last modification'), blank=True, null=True)
     turn = models.CharField(max_length=10, choices=TURNS, default='S', verbose_name=_('turn'))
     expires_at = models.DateTimeField(verbose_name=_('expected expiring date'))
+    rounds_played = models.PositiveIntegerField(default=0, verbose_name=_('round_played'), validators=[MaxValueValidator(6)])
 
     class Meta:
         verbose_name = _('Match')
