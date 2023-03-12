@@ -6,7 +6,7 @@ from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIVie
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import User, Profile
+from .models import User, Player
 from .serializers import UserRegisterSerializer, UserSerializer, UserInfoSerializer, ChangePasswordSerializer, \
     UserFullSerializer, ProfileSerializer
 
@@ -88,7 +88,7 @@ class ProfileView(APIView):
         if not user:
             raise AuthenticationFailed('unauthenticated')
 
-        profile = Profile.objects.filter(user_id=user.id).first()
+        profile = Player.objects.filter(user_id=user.id).first()
 
         if not profile:
             response = {'detail': 'profile not found!'}

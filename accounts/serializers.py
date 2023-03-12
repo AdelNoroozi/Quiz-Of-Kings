@@ -3,7 +3,7 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
-from accounts.models import User, Profile
+from accounts.models import User, Player
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -37,7 +37,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.Meta.model.objects.create_user(**self.clean_validated_data(validated_data))
-        Profile.objects.create(user=user)
+        Player.objects.create(user=user)
         return user
 
 
@@ -97,6 +97,6 @@ class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
 
     class Meta:
-        model = Profile
+        model = Player
         fields = ('id', 'user', 'point', 'coin')
         read_only_fields = ('id',)
