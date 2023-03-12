@@ -5,7 +5,7 @@ from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIVie
 from rest_framework.response import Response
 
 from .models import User
-from .serializers import UserRegisterSerializer, UserSerializer, ChangePasswordSerializer
+from .serializers import UserRegisterSerializer, UserSerializer, UserInfoSerializer, ChangePasswordSerializer
 
 
 class UserRegisterView(CreateAPIView):
@@ -16,6 +16,16 @@ class UserRegisterView(CreateAPIView):
 class UserView(RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def get_object(self):
+        if self.request.user.is_authenticated:
+            return self.request.user
+        raise AuthenticationFailed('unauthenticated')
+
+
+class UserInfoView(RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserInfoSerializer
 
     def get_object(self):
         if self.request.user.is_authenticated:
