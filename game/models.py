@@ -64,6 +64,7 @@ class Match(models.Model):
                                        verbose_name=_('joining player'), blank=True, null=True)
     starter_player_score = models.IntegerField(default=0, verbose_name=_('starter player score'))
     joining_player_score = models.IntegerField(default=0, verbose_name=_('joining player score'))
+    selected_categories = models.ManyToManyField(Category, verbose_name=_('selected categories'))
     status = models.CharField(max_length=15, choices=STATUSES, verbose_name=_('status'))
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('creation time'))
     modificated_at = models.DateTimeField(verbose_name=_('last modification'), blank=True, null=True)
@@ -78,7 +79,7 @@ class Match(models.Model):
         return f'{self.starter_player.user.username} vs {self.joining_player.user.username} at {self.created_at}'
 
 
-class PlayerAnswers(models.Model):
+class PlayerAnswer(models.Model):
     player = models.ForeignKey(Player, on_delete=models.PROTECT, related_name='player_answers',
                                verbose_name=_('player'))
     match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='player_answers', verbose_name=_('match'))

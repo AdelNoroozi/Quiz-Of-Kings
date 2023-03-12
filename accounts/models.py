@@ -59,4 +59,4 @@ class Admin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='admin', verbose_name=_('user'))
 
     def __str__(self):
-        return self.user
+        return self.user.username
