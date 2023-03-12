@@ -4,10 +4,11 @@ from django.shortcuts import render
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from .models import User
+from .models import User, Profile
 from .serializers import UserRegisterSerializer, UserSerializer, UserInfoSerializer, ChangePasswordSerializer, \
-    UserFullSerializer
+    UserFullSerializer, ProfileSerializer
 
 
 class UserRegisterView(CreateAPIView):
@@ -79,3 +80,19 @@ class ChangePasswordView(UpdateAPIView):
 
         response = {'detail': 'password is not correct'}
         return Response(response)
+
+
+class ProfileView(APIView):
+    def get(self, request):
+        user = request.user
+        if not user:
+            raise AuthenticationFailed('unauthenticated')
+
+        profile = Profile.objects.filter(user_id=user.id).first()
+
+        if not profile:
+            response = {'detail': 'profile not found!'}
+            return Response(response)
+
+        serializer = ProfileSerializer(profile)
+        return Response(serializer.data)
