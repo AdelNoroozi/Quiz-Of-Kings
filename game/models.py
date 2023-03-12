@@ -50,3 +50,29 @@ class Choice(models.Model):
 
     def __str__(self):
         return f'{self.question.text} - {self.text}'
+
+
+class Match(models.Model):
+    STATUSES = (('MM', 'matchmaking'),
+                ('OG', 'ongoing'),
+                ('F', 'finished'))
+    TURNS = (('S', 'starter'),
+             ('J', 'joiner'))
+    starter_player = models.ForeignKey(Player, on_delete=models.PROTECT, related_name='player_matches_as_starter',
+                                       verbose_name=_('starter player'))
+    joining_player = models.ForeignKey(Player, on_delete=models.PROTECT, related_name='player_matches_as_joiner',
+                                       verbose_name=_('joining player'), blank=True, null=True)
+    starter_player_score = models.IntegerField(default=0, verbose_name=_('starter player score'))
+    joining_player_score = models.IntegerField(default=0, verbose_name=_('joining player score'))
+    status = models.CharField(max_length=15, choices=STATUSES, verbose_name=_('status'))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('creation time'))
+    modificated_at = models.DateTimeField(verbose_name=_('last modification'), blank=True, null=True)
+    turn = models.CharField(max_length=10, choices=TURNS, default='S', verbose_name=_('turn'))
+    expires_at = models.DateTimeField(verbose_name=_('expected expiring date'))
+
+    class Meta:
+        verbose_name = _('Match')
+        verbose_name_plural = _('Matches')
+
+    def __str__(self):
+        return f'{self.starter_player.user.username} vs {self.joining_player.user.username} at {self.created_at}'
