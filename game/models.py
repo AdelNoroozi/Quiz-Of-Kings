@@ -36,3 +36,17 @@ class Question(models.Model):
 
     def __str__(self):
         return self.text
+
+
+class Choice(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='choices', verbose_name=_('question'))
+    text = models.TextField(verbose_name=_('choice text'))
+    chosen_count = models.IntegerField(default=0, verbose_name=_('chosen count'))
+    is_correct = models.BooleanField(default=False, verbose_name=_('is correct'))
+
+    class Meta:
+        verbose_name = _('Choice')
+        verbose_name_plural = _('Choices')
+
+    def __str__(self):
+        return f'{self.question.text} - {self.text}'
