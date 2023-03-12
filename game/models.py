@@ -22,13 +22,13 @@ class Question(models.Model):
     text = models.TextField(verbose_name=_('question text'))
     answered_count = models.IntegerField(default=0, verbose_name=_('answered count'))
     created_by = models.ForeignKey(Player, on_delete=models.PROTECT, related_name='questions',
-                                   verbose_name=_('creation date'),
+                                   verbose_name=_('creator'),
                                    blank=True, null=True)
     confirmed_by = models.ForeignKey(Admin, on_delete=models.PROTECT, related_name='questions',
-                                     verbose_name=_('confirmation date'),
+                                     verbose_name=_('confirmer'),
                                      blank=True, null=True)
     created_at = models.DateField(auto_now_add=True, verbose_name=_('creation date'))
-    confirmed_at = models.DateField(auto_now_add=True, verbose_name=_('confirmation date'), blank=True, null=True)
+    confirmed_at = models.DateField(verbose_name=_('confirmation date'), blank=True, null=True)
 
     class Meta:
         verbose_name = _('Question')
@@ -76,3 +76,22 @@ class Match(models.Model):
 
     def __str__(self):
         return f'{self.starter_player.user.username} vs {self.joining_player.user.username} at {self.created_at}'
+
+
+class PlayerAnswers(models.Model):
+    player = models.ForeignKey(Player, on_delete=models.PROTECT, related_name='player_answers',
+                               verbose_name=_('player'))
+    match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='player_answers', verbose_name=_('match'))
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='player_answers',
+                                 verbose_name=_('question'))
+    answer = models.ForeignKey(Choice, on_delete=models.CASCADE, related_name='player_answers')
+
+    class Meta:
+        verbose_name = _('Player Answer')
+        verbose_name_plural = _('Player Answers')
+
+    def __str__(self):
+        if self.player == self.match.starter_player:
+            return f'{self.player.user.username} - «{self.question.text}» : «{self.answer.text}» in match vs {self.match.joining_player} at «{self.match.created_at}»'
+        else:
+            return f'{self.player.user.username} - «{self.question.text}» : «{self.answer.text}» in match vs {self.match.starter_player} at «{self.match.created_at}»'

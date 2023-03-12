@@ -52,7 +52,7 @@ class Player(models.Model):
     coin = models.PositiveIntegerField(verbose_name=_('coin'), default=0)
 
     def __str__(self):
-        return self.user
+        return self.user.username
 
 
 class Admin(models.Model):
