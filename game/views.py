@@ -2,7 +2,8 @@ from django.shortcuts import render
 from rest_framework import viewsets, mixins
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
-from .models import Question, Choice
+from .models import Question, Choice, PlayerAnswer
+from .serializers import ChoiceSerializer, PlayerAnswerSerializer
 
 
 # later
@@ -63,12 +64,9 @@ class GenerateRandomQuestionView(APIView):
 
 
 # Sajjad
-class ChoicesViewSet(mixins.CreateModelMixin,
-                     mixins.RetrieveModelMixin,
-                     mixins.UpdateModelMixin,
-                     GenericViewSet):
-    serializer_class = ''
-    queryset = ''
+class ChoicesViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, GenericViewSet):
+    serializer_class = ChoiceSerializer
+    queryset = Choice.objects.all()
 
 
 # Adel
@@ -82,11 +80,9 @@ class FinishMatch(APIView):
 
 
 # Sajjad
-class PlayerAnswerViewSet(mixins.CreateModelMixin,
-                          mixins.RetrieveModelMixin,
-                          GenericViewSet):
-    serializer_class = ''
-    queryset = ''
+class PlayerAnswerViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
+    serializer_class = PlayerAnswerSerializer
+    queryset = PlayerAnswer.objects.all()
 
 
 # Adel
