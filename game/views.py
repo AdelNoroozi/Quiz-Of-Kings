@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 from .models import Question, Choice
 
+
 # later
 def matchmaking():
     pass
@@ -15,8 +16,13 @@ def join_match():
 
 
 # sajjad
-def reduce_coin(coins):
-    pass
+def reduce_coin(player, coins):
+    if player.coin >= coins:
+        player.coin -= coins
+    else:
+        player.coin = 0
+
+    player.save()
 
 
 # later
@@ -61,7 +67,8 @@ class ChoicesViewSet(mixins.CreateModelMixin,
                      mixins.RetrieveModelMixin,
                      mixins.UpdateModelMixin,
                      GenericViewSet):
-    pass
+    serializer_class = ''
+    queryset = ''
 
 
 # Adel
@@ -78,7 +85,8 @@ class FinishMatch(APIView):
 class PlayerAnswerViewSet(mixins.CreateModelMixin,
                           mixins.RetrieveModelMixin,
                           GenericViewSet):
-    pass
+    serializer_class = ''
+    queryset = ''
 
 
 # Adel
