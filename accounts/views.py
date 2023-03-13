@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 
 from .models import User, Player
 from .serializers import UserRegisterSerializer, UserSerializer, UserInfoSerializer, ChangePasswordSerializer, \
-    UserFullSerializer, ProfileSerializer
+    UserFullSerializer, PlayerSerializer
 
 
 class UserRegisterView(CreateAPIView):
@@ -94,5 +94,5 @@ class ProfileView(APIView):
             response = {'detail': 'profile not found!'}
             return Response(response)
 
-        serializer = ProfileSerializer(profile)
+        serializer = PlayerSerializer(profile)
         return Response(serializer.data)

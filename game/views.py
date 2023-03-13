@@ -21,7 +21,6 @@ class StartMatchView(APIView):
 
 
 class MatchViewSet(mixins.RetrieveModelMixin,
-                   mixins.DestroyModelMixin,
                    mixins.ListModelMixin,
                    GenericViewSet):
     pass

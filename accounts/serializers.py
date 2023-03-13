@@ -93,10 +93,28 @@ class UserInfoSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'is_superuser', 'is_staff', 'is_active')
 
 
-class ProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+class PlayerSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True, many=False)
+
+    class Meta:
+        model = Player
+        fields = ('id', 'user')
+        read_only_fields = ('id',)
+
+
+class PlayerMiniSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True, many=False)
 
     class Meta:
         model = Player
         fields = ('id', 'user', 'point', 'coin')
+        read_only_fields = ('id',)
+
+
+class AdminSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True, many=False)
+
+    class Meta:
+        model = Player
+        fields = ('id', 'user')
         read_only_fields = ('id',)
