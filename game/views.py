@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets, mixins
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
-
+from .models import Question, Choice
 
 # later
 def matchmaking():
@@ -87,8 +87,9 @@ def remove_incorrect_choices_help():
 
 
 # Sajjad
-def popular_choices_help():
-    pass
+def popular_choices_help(question_id):
+    choices = Choice.objects.filter(question_id=question_id).values('pk', 'chosen_count')
+    return choices
 
 # def second_chance_help():
 #     pass
