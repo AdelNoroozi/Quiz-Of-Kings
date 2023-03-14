@@ -8,7 +8,7 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('id', 'name', 'is_active')
-        read_only_fields = ('id','is_active')
+        read_only_fields = ('id', 'is_active')
 
 
 class ChoiceMiniSerializer(serializers.ModelSerializer):
@@ -81,8 +81,9 @@ class PlayerAnswerSerializer(serializers.ModelSerializer):
     match = MatchMiniSerializer(many=False)
     question = QuestionMiniSerializer(many=False)
     answer = ChoiceMiniSerializer(many=False)
+    result = serializers.BooleanField(source='answer.is_correct')
 
     class Meta:
         model = PlayerAnswer
-        fields = ('player', 'match', 'question', 'answer')
-        read_only_fields = ('id',)
+        fields = ('player', 'match', 'question', 'answer', 'result')
+        read_only_fields = ('id', 'result')
