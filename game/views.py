@@ -2,6 +2,7 @@ import random
 
 from django.shortcuts import render
 from rest_framework import viewsets, mixins, status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
@@ -61,6 +62,14 @@ class GenerateRandomCategoryView(APIView):
 class QuestionViewSet(viewsets.ModelViewSet):
     serializer_class = QuestionSerializer
     queryset = Question.objects.all()
+
+    @action(detail=True, methods=['GET'])
+    def remove_incorrect_choices_help(self, request, pk=None):
+        question = Question.objects.get(id=pk)
+        retrieving_choices = Choice.objects.filter(question=question, is_correct=False).order_by('?')[0:2]
+        reduce_coin(10)
+        serializer = ChoiceMiniSerializer(retrieving_choices, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 # Sajjad
@@ -139,11 +148,6 @@ class FinishMatch(APIView):
 class PlayerAnswerViewSet(mixins.CreateModelMixin,
                           mixins.RetrieveModelMixin,
                           GenericViewSet):
-    pass
-
-
-# Adel
-def remove_incorrect_choices_help():
     pass
 
 
