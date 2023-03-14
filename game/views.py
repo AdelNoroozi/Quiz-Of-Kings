@@ -2,6 +2,10 @@ from django.shortcuts import render
 from rest_framework import viewsets, mixins
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
+from game.models import *
+from game.serializers import *
+
+
 
 
 # later
@@ -28,7 +32,8 @@ class StartMatchView(APIView):
 class MatchViewSet(mixins.RetrieveModelMixin,
                    mixins.ListModelMixin,
                    GenericViewSet):
-    pass
+    serializer_class = MatchSerializer
+    queryset = Match.objects.all()
 
 
 # Adel
@@ -38,7 +43,8 @@ class QuitMatchView(APIView):
 
 # Adel
 class CategoryViewSet(viewsets.ModelViewSet):
-    pass
+    serializer_class = CategorySerializer
+    queryset = Category.objects.all()
 
 
 # Adel
@@ -48,7 +54,8 @@ class GenerateRandomCategoryView(APIView):
 
 # Adel
 class QuestionViewSet(viewsets.ModelViewSet):
-    pass
+    serializer_class = QuestionSerializer
+    queryset = Question.objects.all()
 
 
 # Sajjad
