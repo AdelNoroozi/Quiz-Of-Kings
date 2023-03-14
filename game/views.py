@@ -1,11 +1,13 @@
+import random
+
 from django.shortcuts import render
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
+from rest_framework import serializers
 from game.models import *
 from game.serializers import *
-
-
 
 
 # later
@@ -49,7 +51,10 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 # Adel
 class GenerateRandomCategoryView(APIView):
-    pass
+    def get(self, request):
+        categories = Category.objects.filter(is_active=True).order_by('?')
+        serializer = CategorySerializer(categories, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 # Adel
