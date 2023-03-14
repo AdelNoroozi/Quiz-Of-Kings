@@ -78,7 +78,56 @@ class ChoicesViewSet(mixins.CreateModelMixin,
 
 # Adel
 class AnswerQuestionView(APIView):
-    pass
+    def post(self, request):
+        # user = request.user
+        try:
+            # user is temporarily gathered by id
+            user_id = request.data['user_id']
+            match_id = request.data['match_id']
+            question_id = request.data['question_id']
+            answer_id = request.data['answer_id']
+        except:
+            response = {'message': 'invalid fields'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                match = Match.objects.get(id=match_id)
+                question = Question.objects.get(id=question_id)
+                choice = Choice.objects.get(id=answer_id)
+                player = Player.objects.get(user_id=user_id)
+            except:
+                response = {'message': 'could not find objects with specified ids'}
+                return Response(response, status=status.HTTP_404_NOT_FOUND)
+            else:
+                try:
+                    PlayerAnswer.objects.get(player=player, match=match, question=question)
+                except:
+                    if match.starter_player == player:
+                        if match.turn == 'J':
+                            response = {'message': 'it is not this players turn'}
+                            return Response(response, status=status.HTTP_403_FORBIDDEN)
+                    elif match.joining_player == player:
+                        if match.turn == 'S':
+                            response = {'message': 'it is not this players turn'}
+                            return Response(response, status=status.HTTP_403_FORBIDDEN)
+                    question.answered_count += 1
+                    question.save()
+                    choice.chosen_count += 1
+                    choice.save()
+                    if choice.is_correct:
+                        if match.starter_player == player:
+                            match.starter_player_score += 1
+                            match.save()
+                        elif match.joining_player == player:
+                            match.joining_player_score += 1
+                            match.save()
+                    player_answer = PlayerAnswer.objects.create(match=match, player=player, question=question,
+                                                                answer=choice)
+                    serializer = PlayerAnswerSerializer(player_answer)
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                else:
+                    response = {'message': 'player has already answered this question in this match'}
+                    return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Sajjad
