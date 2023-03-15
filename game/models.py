@@ -67,13 +67,14 @@ class Match(models.Model):
                                        verbose_name=_('joining player'), blank=True, null=True)
     starter_player_score = models.PositiveIntegerField(default=0, verbose_name=_('starter player score'))
     joining_player_score = models.PositiveIntegerField(default=0, verbose_name=_('joining player score'))
-    selected_categories = models.ManyToManyField(Category, verbose_name=_('selected categories'))
+    selected_categories = models.ManyToManyField(Category, blank=True, verbose_name=_('selected categories'))
     status = models.CharField(max_length=15, choices=STATUSES, verbose_name=_('status'))
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('creation time'))
     modified_at = models.DateTimeField(verbose_name=_('last modification'), blank=True, null=True)
     turn = models.CharField(max_length=10, choices=TURNS, default='S', verbose_name=_('turn'))
     expires_at = models.DateTimeField(verbose_name=_('expected expiring date'))
-    rounds_played = models.PositiveIntegerField(default=0, verbose_name=_('round_played'), validators=[MaxValueValidator(6)])
+    rounds_played = models.PositiveIntegerField(default=0, verbose_name=_('round_played'),
+                                                validators=[MaxValueValidator(6)])
 
     class Meta:
         verbose_name = _('Match')

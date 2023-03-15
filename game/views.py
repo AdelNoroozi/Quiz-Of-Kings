@@ -38,6 +38,16 @@ class MatchViewSet(mixins.RetrieveModelMixin,
     serializer_class = MatchSerializer
     queryset = Match.objects.all()
 
+    @action(detail=True, methods=['PATCH'])
+    def add_selected_category(self, request, pk=None):
+        match = Match.objects.get(id=pk)
+        category_id = request.data['category_id']
+        category = Category.objects.get(id=category_id)
+        match.selected_categories.add(category)
+        match.save()
+        response = {'message': 'category added successfully'}
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
 
 # Adel
 class QuitMatchView(APIView):
