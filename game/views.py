@@ -3,6 +3,7 @@ import random
 from django.shortcuts import render
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
@@ -106,7 +107,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
     def remove_incorrect_choices_help(self, request, pk=None):
         question = Question.objects.get(id=pk)
         retrieving_choices = Choice.objects.filter(question=question, is_correct=False).order_by('?')[0:2]
-        reduce_coin(10)
+        reduce_coin(10) # todo get player and pass it to function
         serializer = ChoiceMiniSerializer(retrieving_choices, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -132,25 +133,25 @@ class ChoicesViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
 # Adel
 class AnswerQuestionView(APIView):
     def post(self, request):
-        # user = request.user
+        user = request.user
+        if user.is_anonymous:
+            raise AuthenticationFailed('unauthenticated')
         try:
-            # user is temporarily gathered by id
-            user_id = request.data['user_id']
             match_id = request.data['match_id']
             question_id = request.data['question_id']
             answer_id = request.data['answer_id']
-        except:
-            response = {'message': 'invalid fields'}
+        except Exception as e:
+            response = {'message': str(e)}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
         else:
             try:
                 match = Match.objects.get(id=match_id)
                 question = Question.objects.get(id=question_id)
                 choice = Choice.objects.get(id=answer_id)
-                player = Player.objects.get(user_id=user_id)
-            except:
-                response = {'message': 'could not find objects with specified ids'}
-                return Response(response, status=status.HTTP_404_NOT_FOUND)
+                player = Player.objects.get(user_id=user.id)
+            except Exception as e:
+                response = {'message': str(e)}
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
             else:
                 try:
                     PlayerAnswer.objects.get(player=player, match=match, question=question)
