@@ -132,7 +132,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
     def remove_incorrect_choices_help(self, request, pk=None):
         question = Question.objects.get(id=pk)
         retrieving_choices = Choice.objects.filter(question=question, is_correct=False).order_by('?')[0:2]
-        reduce_coin(10) # todo get player and pass it to function
+        reduce_coin(10)  # todo get player and pass it to function
         serializer = ChoiceMiniSerializer(retrieving_choices, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -210,8 +210,30 @@ class AnswerQuestionView(APIView):
 
 
 # Sajjad
-class FinishMatch(APIView):
-    pass
+def finish_match(match_id, state):
+    match = Match.objects.filter(id=match_id).first()
+    if not match:
+        response = {'message': 'match NOT found!'}
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+    elif match.status == 'finished':
+        response = {'message': 'match NOT found (already finished)!'}
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+    elif match.status == 'quited':
+        response = {'message': 'match NOT found (already quited)!'}
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+    elif match.status == 'ongoing':
+        if state == 'finished' or state == 'quited':
+            match.status = state
+            match.save()
+
+            response = {'message': f'match state changed to {state}!'}
+            return Response(response, status=status.HTTP_200_OK)
+
+        response = {'message': 'status is not valid'}
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Sajjad

@@ -58,7 +58,9 @@ class Choice(models.Model):
 class Match(models.Model):
     STATUSES = (('MM', 'matchmaking'),
                 ('OG', 'ongoing'),
-                ('F', 'finished'))
+                ('F', 'finished'),
+                ('Q', 'quited'))
+
     TURNS = (('S', 'starter'),
              ('J', 'joiner'))
     starter_player = models.ForeignKey(Player, on_delete=models.PROTECT, related_name='player_matches_as_starter',
