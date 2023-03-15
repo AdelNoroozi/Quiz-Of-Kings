@@ -46,7 +46,19 @@ class MatchViewSet(mixins.RetrieveModelMixin,
         match.selected_categories.add(category)
         match.save()
         response = {'message': 'category added successfully'}
-        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        return Response(response, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['PATCH'])
+    def finish_round(self, request, pk=None):
+        match = Match.objects.get(id=pk)
+        if match.rounds_played >= 6:
+            response = {'message': 'this match has already reached to its maximum possible rounds'}
+            return Response(response, status=status.HTTP_406_NOT_ACCEPTABLE)
+        else:
+            match.rounds_played += 1
+            match.save()
+            response = {'message': 'round finished successfully'}
+            return Response(response, status=status.HTTP_200_OK)
 
 
 # Adel
