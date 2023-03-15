@@ -70,6 +70,10 @@ class MatchViewSet(mixins.RetrieveModelMixin,
     @action(detail=True, methods=['PATCH'])
     def finish_round(self, request, pk=None):
         match = Match.objects.get(id=pk)
+        if not match:
+            response = {'message': 'match NOT found!'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
         if match.rounds_played >= 6:
             response = {'message': 'this match has already reached to its maximum possible rounds'}
             return Response(response, status=status.HTTP_406_NOT_ACCEPTABLE)
