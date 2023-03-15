@@ -86,13 +86,21 @@ class MatchViewSet(mixins.RetrieveModelMixin,
     @action(detail=True, methods=['PATCH'])
     def change_turn(self, request, pk=None):
         match = Match.objects.get(id=pk)
+        if not match:
+            response = {'message': 'match NOT found!'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        turn = ''
         if match.turn == 'S':
             match.turn = 'J'
             match.save()
+            turn = 'joining player'
+
         elif match.turn == 'J':
             match.turn = 'S'
             match.save()
-        response = {'message': 'turn changed successfully'}
+            turn = 'starter player'
+
+        response = {'message': f'turn changed to {turn} successfully'}
         return Response(response, status=status.HTTP_200_OK)
 
 
