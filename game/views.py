@@ -60,6 +60,18 @@ class MatchViewSet(mixins.RetrieveModelMixin,
             response = {'message': 'round finished successfully'}
             return Response(response, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=['PATCH'])
+    def change_turn(self, request, pk=None):
+        match = Match.objects.get(id=pk)
+        if match.turn == 'S':
+            match.turn = 'J'
+            match.save()
+        elif match.turn == 'J':
+            match.turn = 'S'
+            match.save()
+        response = {'message': 'turn changed successfully'}
+        return Response(response, status=status.HTTP_200_OK)
+
 
 # Adel
 class QuitMatchView(APIView):
