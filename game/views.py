@@ -22,8 +22,13 @@ def join_match():
 
 
 # sajjad
-def reduce_coin(coins):
-    pass
+def reduce_coin(player, coins):
+    if player.coin >= coins:
+        player.coin -= coins
+    else:
+        player.coin = 0
+
+    player.save()
 
 
 # later
@@ -108,15 +113,20 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
 # Sajjad
 class GenerateRandomQuestionView(APIView):
-    pass
+    def get(self, request, pk):
+        questions = Question.objects.filter(category_id=pk).order_by('?')[:3]
+        if questions is None:
+            response = {'detail': 'there are no questions in this category'}
+            return Response(response)
+
+        serializer = QuestionSerializer(questions, many=True)
+        return Response(serializer.data)
 
 
 # Sajjad
-class ChoicesViewSet(mixins.CreateModelMixin,
-                     mixins.RetrieveModelMixin,
-                     mixins.UpdateModelMixin,
-                     GenericViewSet):
-    pass
+class ChoicesViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, GenericViewSet):
+    serializer_class = ChoiceSerializer
+    queryset = Choice.objects.all()
 
 
 # Adel
@@ -179,15 +189,15 @@ class FinishMatch(APIView):
 
 
 # Sajjad
-class PlayerAnswerViewSet(mixins.CreateModelMixin,
-                          mixins.RetrieveModelMixin,
-                          GenericViewSet):
-    pass
+class PlayerAnswerViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
+    serializer_class = PlayerAnswerSerializer
+    queryset = PlayerAnswer.objects.all()
 
 
 # Sajjad
-def popular_choices_help():
-    pass
+def popular_choices_help(question_id):
+    choices = Choice.objects.filter(question_id=question_id).values('pk', 'chosen_count')
+    return choices
 
 # def second_chance_help():
 #     pass
