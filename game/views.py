@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from rest_framework import viewsets, mixins
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 from .models import Question, Choice, PlayerAnswer
-from .serializers import ChoiceSerializer, PlayerAnswerSerializer
+from .serializers import ChoiceSerializer, PlayerAnswerSerializer, QuestionMiniSerializer, QuestionSerializer
 
 
 # later
@@ -60,7 +61,14 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
 # Sajjad
 class GenerateRandomQuestionView(APIView):
-    pass
+    def get(self, request, pk):
+        questions = Question.objects.filter(category_id=pk).order_by('?')[:3]
+        if questions is None:
+            response = {'detail': 'there are no questions in this category'}
+            return Response(response)
+
+        serializer = QuestionSerializer(questions, many=True)
+        return Response(serializer.data)
 
 
 # Sajjad
