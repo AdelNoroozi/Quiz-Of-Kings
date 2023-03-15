@@ -47,8 +47,21 @@ class MatchViewSet(mixins.RetrieveModelMixin,
     @action(detail=True, methods=['PATCH'])
     def add_selected_category(self, request, pk=None):
         match = Match.objects.get(id=pk)
-        category_id = request.data['category_id']
+        if not match:
+            response = {'message': 'match NOT found!'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            category_id = request.data['category_id']
+        except Exception as e:
+            response = {'message': str(e)}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
         category = Category.objects.get(id=category_id)
+        if not match:
+            response = {'message': 'category NOT found!'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
         match.selected_categories.add(category)
         match.save()
         response = {'message': 'category added successfully'}
