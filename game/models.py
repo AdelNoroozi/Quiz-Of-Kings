@@ -74,7 +74,7 @@ class Match(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('creation time'))
     modified_at = models.DateTimeField(verbose_name=_('last modification'), blank=True, null=True)
     turn = models.CharField(max_length=10, choices=TURNS, default='S', verbose_name=_('turn'))
-    expires_at = models.DateTimeField(verbose_name=_('expected expiring date'))
+    expires_at = models.DateTimeField(verbose_name=_('expected expiring date'), blank=True, null=True)
     rounds_played = models.PositiveIntegerField(default=0, verbose_name=_('round_played'),
                                                 validators=[MaxValueValidator(6)])
 
