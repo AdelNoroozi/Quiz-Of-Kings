@@ -1,6 +1,8 @@
 from django.core.validators import MaxValueValidator
 from django.db import models
+from django.db.models import Count, Sum
 from django.utils.translation import gettext_lazy as _
+from rest_framework.response import Response
 
 from accounts.models import Player, Admin
 
@@ -39,6 +41,20 @@ class Question(models.Model):
 
     def __str__(self):
         return self.text
+
+    def get_popular_choices(self):
+        choices = Choice.objects.filter(question_id=self.id).values('pk', 'chosen_count')
+        sum_count = choices.aggregate(s=Sum('chosen_count'))
+
+        if not choices:
+            response_data = {'detail': 'NOT found'}
+            return Response(response_data)
+
+        response = {'question_id': self.id}
+        for choice in choices:
+            response[choice['pk']] = round((choice['chosen_count'] / sum_count['s']) * 100, 2)
+
+        return Response(response)
 
 
 class Choice(models.Model):

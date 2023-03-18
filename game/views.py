@@ -132,11 +132,6 @@ class MatchViewSet(mixins.RetrieveModelMixin,
 
 
 # Adel
-class QuitMatchView(APIView):
-    pass
-
-
-# Adel
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
