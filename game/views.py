@@ -8,6 +8,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 from rest_framework import serializers
+
+from accounts.models import User
 from game.models import *
 from game.serializers import *
 
@@ -29,8 +31,16 @@ def matchmaking(user):
 
 
 # later
-def join_match():
-    pass
+def join_match(match: Match, user: User):
+    player = Player.objects.get(user=user)
+    if not player:
+        response = {'message': 'player not found'}
+        return Response(response, status=status.HTTP_404_NOT_FOUND)
+    match.joining_player = player
+    match.status = 'OG'
+    match.save()
+    serializer = MatchMiniSerializer(match)
+    return Response(serializer.data)
 
 
 # sajjad
