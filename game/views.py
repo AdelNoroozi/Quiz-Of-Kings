@@ -55,7 +55,13 @@ def reduce_coin(player, coins):
 
 # later
 class StartMatchView(APIView):
-    pass
+    def patch(self, request):
+        ready_matches = Match.objects.filter(status='MM')
+        user = request.user
+        if not ready_matches:
+            matchmaking(user)
+        else:
+            join_match(user=user, match=ready_matches.first())
 
 
 # Adel
