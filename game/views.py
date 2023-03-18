@@ -13,8 +13,19 @@ from game.serializers import *
 
 
 # later
-def matchmaking():
-    pass
+def matchmaking(user):
+    player = Player.objects.filter(user=user).first()
+    if not player:
+        response = {'detail': 'player Not found!'}
+        return Response(response)
+    try:
+        match = Match.objects.create(starter_player=player, status='MM')
+    except Exception as e:
+        response = {'detail': str(e)}
+        return Response(response)
+
+    serializer = MatchMiniSerializer(match)
+    return Response(serializer.data)
 
 
 # later
