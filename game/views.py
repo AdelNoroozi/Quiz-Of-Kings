@@ -61,7 +61,13 @@ class StartMatchView(APIView):
         if not ready_matches:
             matchmaking(user)
         else:
-            join_match(user=user, match=ready_matches.first())
+            player = Player.objects.get(user=user)
+            match = ready_matches.first()
+
+            if match.starter_player == player:
+                matchmaking(user)
+
+            join_match(user=user, match=match)
 
 
 # Adel
@@ -136,6 +142,16 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
 
+    @action(detail=True, methods=['GET'])
+    def random_questions(self, request, pk=None):
+        questions = Question.objects.filter(category_id=pk).order_by('?')[:3]
+        if questions is None:
+            response = {'detail': 'there are no questions in this category'}
+            return Response(response)
+
+        serializer = QuestionSerializer(questions, many=True)
+        return Response(serializer.data)
+
 
 # Adel
 class GenerateRandomCategoryView(APIView):
@@ -157,18 +173,6 @@ class QuestionViewSet(viewsets.ModelViewSet):
         reduce_coin(10)  # todo get player and pass it to function
         serializer = ChoiceMiniSerializer(retrieving_choices, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-# Sajjad
-class GenerateRandomQuestionView(APIView):
-    def get(self, request, pk):
-        questions = Question.objects.filter(category_id=pk).order_by('?')[:3]
-        if questions is None:
-            response = {'detail': 'there are no questions in this category'}
-            return Response(response)
-
-        serializer = QuestionSerializer(questions, many=True)
-        return Response(serializer.data)
 
 
 # Sajjad
