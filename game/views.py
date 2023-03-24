@@ -16,7 +16,7 @@ from game.serializers import *
 
 # later
 def matchmaking(user):
-    player = Player.objects.filter(user=user).first()
+    player = Player.objects.filter(user_id=user.id).first()
     if not player:
         response = {'detail': 'player Not found!'}
         return Response(response)
@@ -26,21 +26,19 @@ def matchmaking(user):
         response = {'detail': str(e)}
         return Response(response)
 
-    serializer = MatchMiniSerializer(match)
-    return Response(serializer.data)
+    return match
 
 
 # later
 def join_match(match: Match, user: User):
-    player = Player.objects.get(user=user)
+    player = Player.objects.filter(user_id=user.id).first()
     if not player:
         response = {'message': 'player not found'}
         return Response(response, status=status.HTTP_404_NOT_FOUND)
     match.joining_player = player
     match.status = 'OG'
     match.save()
-    serializer = MatchMiniSerializer(match)
-    return Response(serializer.data)
+    return match
 
 
 # sajjad
@@ -55,19 +53,30 @@ def reduce_coin(player, coins):
 
 # later
 class StartMatchView(APIView):
-    def patch(self, request):
+    def post(self, request):
         ready_matches = Match.objects.filter(status='MM')
         user = request.user
+
+        if user.is_anonymous:
+            raise AuthenticationFailed('unauthenticated')
+
         if not ready_matches:
-            matchmaking(user)
+            match = matchmaking(user)
+            serializer = MatchMiniSerializer(match)
+            return Response(serializer.data)
+
         else:
-            player = Player.objects.get(user=user)
-            match = ready_matches.first()
+            player = Player.objects.filter(user_id=user.id).first()
+            match = ready_matches.order_by('?').first()
 
-            if match.starter_player == player:
-                matchmaking(user)
+            if match.starter_player.id == player.id:
+                match = matchmaking(user)
+                serializer = MatchMiniSerializer(match)
+                return Response(serializer.data)
 
-            join_match(user=user, match=match)
+            match = join_match(user=user, match=match)
+            serializer = MatchMiniSerializer(match)
+            return Response(serializer.data)
 
 
 # Adel
