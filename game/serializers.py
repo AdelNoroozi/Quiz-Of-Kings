@@ -42,7 +42,7 @@ class QuestionMiniSerializer(serializers.ModelSerializer):
 
 
 class ChoiceSerializer(serializers.ModelSerializer):
-    question = QuestionSerializer(many=False)
+    question = QuestionMiniSerializer(many=False, read_only=True)
 
     class Meta:
         model = Choice
@@ -78,8 +78,8 @@ class MatchMiniSerializer(serializers.ModelSerializer):
 
 class PlayerAnswerSerializer(serializers.ModelSerializer):
     player = PlayerMiniSerializer(many=False, read_only=True)
-    match = MatchMiniSerializer(many=False)
-    question = QuestionMiniSerializer(many=False)
+    match = MatchMiniSerializer(many=False,read_only=True)
+    question = QuestionMiniSerializer(many=False,read_only=True)
     answer = ChoiceMiniSerializer(many=False)
     result = serializers.BooleanField(source='answer.is_correct')
 

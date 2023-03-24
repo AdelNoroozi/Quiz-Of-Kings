@@ -79,6 +79,10 @@ class StartMatchView(APIView):
             return Response(serializer.data)
 
 
+#
+# def finish_match(match_id, state):
+
+
 # Adel
 class MatchViewSet(mixins.RetrieveModelMixin,
                    mixins.ListModelMixin,
@@ -145,6 +149,32 @@ class MatchViewSet(mixins.RetrieveModelMixin,
         response = {'message': f'turn changed to {turn} successfully'}
         return Response(response, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=['PATCH'])
+    def finish_match(self, request, pk=None):
+        match = Match.objects.filter(id=pk).first()
+        state = request.data['state']
+        if not match:
+            response = {'message': 'match NOT found!'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        elif match.status == 'F':
+            response = {'message': 'match NOT found (already finished)!'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        elif match.status == 'Q':
+            response = {'message': 'match NOT found (already quited)!'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        elif match.status == 'OG':
+            if state == 'F' or state == 'Q':
+                match.status = state
+                match.save()
+                response = {'message': f'match state changed to {state}!'}
+                return Response(response, status=status.HTTP_200_OK)
+            else:
+                response = {'message': 'status is not valid'}
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
 
 # Adel
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -179,9 +209,15 @@ class QuestionViewSet(viewsets.ModelViewSet):
     def remove_incorrect_choices_help(self, request, pk=None):
         question = Question.objects.get(id=pk)
         retrieving_choices = Choice.objects.filter(question=question, is_correct=False).order_by('?')[0:2]
-        reduce_coin(10)  # todo get player and pass it to function
+        # reduce_coin(request.user,10)  # todo get player and pass it to function
         serializer = ChoiceMiniSerializer(retrieving_choices, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['GET'])
+    def popular_choices_help(self, request, pk=None):
+        question = Question.objects.get(id=pk)
+
+        return question.get_popular_choices()
 
 
 # Sajjad
@@ -245,30 +281,6 @@ class AnswerQuestionView(APIView):
 
 
 # Sajjad
-def finish_match(match_id, state):
-    match = Match.objects.filter(id=match_id).first()
-    if not match:
-        response = {'message': 'match NOT found!'}
-        return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-    elif match.status == 'finished':
-        response = {'message': 'match NOT found (already finished)!'}
-        return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-    elif match.status == 'quited':
-        response = {'message': 'match NOT found (already quited)!'}
-        return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-    elif match.status == 'ongoing':
-        if state == 'finished' or state == 'quited':
-            match.status = state
-            match.save()
-
-            response = {'message': f'match state changed to {state}!'}
-            return Response(response, status=status.HTTP_200_OK)
-
-        response = {'message': 'status is not valid'}
-        return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Sajjad
@@ -276,11 +288,8 @@ class PlayerAnswerViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, Ge
     serializer_class = PlayerAnswerSerializer
     queryset = PlayerAnswer.objects.all()
 
-
 # Sajjad
-def popular_choices_help(question_id):
-    choices = Choice.objects.filter(question_id=question_id).values('pk', 'chosen_count')
-    return choices
+
 
 # def second_chance_help():
 #     pass
