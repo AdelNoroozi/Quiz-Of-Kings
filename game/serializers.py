@@ -76,10 +76,22 @@ class MatchMiniSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'created_at')
 
 
+class CreateQuestionSerializer(serializers.ModelSerializer):
+    def save(self, **kwargs):
+        category_id = self.context['category_id']
+        question_text = self.validated_data['text']
+        self.instance = Question.objects.create(category_id=category_id, text=question_text)
+        return self.instance
+
+    class Meta:
+        model = Question
+        fields = ('id', 'text')
+
+
 class PlayerAnswerSerializer(serializers.ModelSerializer):
     player = PlayerMiniSerializer(many=False, read_only=True)
-    match = MatchMiniSerializer(many=False,read_only=True)
-    question = QuestionMiniSerializer(many=False,read_only=True)
+    match = MatchMiniSerializer(many=False, read_only=True)
+    question = QuestionMiniSerializer(many=False, read_only=True)
     answer = ChoiceMiniSerializer(many=False)
     result = serializers.BooleanField(source='answer.is_correct')
 

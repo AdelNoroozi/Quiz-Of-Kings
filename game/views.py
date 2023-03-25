@@ -202,8 +202,21 @@ class GenerateRandomCategoryView(APIView):
 
 # Adel
 class QuestionViewSet(viewsets.ModelViewSet):
-    serializer_class = QuestionSerializer
     queryset = Question.objects.all()
+
+    def get_queryset(self):
+        category_id = self.kwargs.get('category_pk')
+        category_questions = Question.objects.filter(category_id=category_id)
+        return category_questions
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateQuestionSerializer
+        else:
+            return QuestionSerializer
+
+    def get_serializer_context(self):
+        return {'category_id': self.kwargs.get('category_pk')}
 
     @action(detail=True, methods=['GET'])
     def remove_incorrect_choices_help(self, request, pk=None):
