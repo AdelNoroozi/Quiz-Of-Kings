@@ -221,7 +221,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
                 'question_id': self.kwargs.get('pk')}
 
     @action(detail=True, methods=['GET'])
-    def remove_incorrect_choices_help(self, request, pk=None):
+    def remove_incorrect_choices_help(self, request, category_pk, pk=None):
         question = Question.objects.get(id=pk)
         retrieving_choices = Choice.objects.filter(question=question, is_correct=False).order_by('?')[0:2]
         # reduce_coin(request.user,10)  # todo get player and pass it to function
@@ -229,16 +229,31 @@ class QuestionViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['GET'])
-    def popular_choices_help(self, request, pk=None):
+    def popular_choices_help(self, request, category_pk, pk=None):
         question = Question.objects.get(id=pk)
 
         return question.get_popular_choices()
 
 
 # Sajjad
-class ChoicesViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, GenericViewSet):
+class ChoicesViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin,
+                     GenericViewSet):
     serializer_class = ChoiceSerializer
-    queryset = Choice.objects.all()
+
+    def get_queryset(self):
+        question_id = self.kwargs.get('question_pk')
+        question_choices = Choice.objects.filter(question_id=question_id)
+        return question_choices
+
+    def get_serializer_context(self):
+        return {'question_id': self.kwargs.get('question_pk'),
+                'choice_id': self.kwargs.get('pk')}
+
+    def get_serializer_class(self):
+        if not self.request.method in SAFE_METHODS:
+            return CreateChoiceSerializer
+        else:
+            return ChoiceSerializer
 
 
 # Adel
