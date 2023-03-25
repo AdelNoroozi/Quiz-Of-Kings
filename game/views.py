@@ -4,6 +4,7 @@ from django.shortcuts import render
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.permissions import SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
@@ -210,13 +211,14 @@ class QuestionViewSet(viewsets.ModelViewSet):
         return category_questions
 
     def get_serializer_class(self):
-        if self.request.method == 'POST':
+        if not self.request.method in SAFE_METHODS:
             return CreateQuestionSerializer
         else:
             return QuestionSerializer
 
     def get_serializer_context(self):
-        return {'category_id': self.kwargs.get('category_pk')}
+        return {'category_id': self.kwargs.get('category_pk'),
+                'question_id': self.kwargs.get('pk')}
 
     @action(detail=True, methods=['GET'])
     def remove_incorrect_choices_help(self, request, pk=None):

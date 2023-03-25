@@ -80,8 +80,17 @@ class CreateQuestionSerializer(serializers.ModelSerializer):
     def save(self, **kwargs):
         category_id = self.context['category_id']
         question_text = self.validated_data['text']
-        self.instance = Question.objects.create(category_id=category_id, text=question_text)
+        try:
+            question_id = self.context['question_id']
+            question = Question.objects.get(id=question_id)
+            question.text = question_text
+            question.save()
+            self.instance = question
+        except:
+            self.instance = Question.objects.create(category_id=category_id, text=question_text)
+            # return Response({'no':'no'})
         return self.instance
+
 
     class Meta:
         model = Question
