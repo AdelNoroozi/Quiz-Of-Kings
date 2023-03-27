@@ -1,0 +1,22 @@
+from rest_framework.permissions import BasePermission, SAFE_METHODS, IsAuthenticated
+
+
+class IsNotAuthenticated(BasePermission):
+    def has_permission(self, request, view):
+        if request.method in SAFE_METHODS:
+            return True
+        return request.user.is_anonymous
+
+
+class IsAdminOrReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        if request.method in SAFE_METHODS:
+            return True
+        return bool(request.user and request.is_staff)
+
+
+class IsSuperUserOrReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        if request.method in SAFE_METHODS:
+            return True
+        return bool(request.user and request.user.is_staff and request.user.is_superuser)
