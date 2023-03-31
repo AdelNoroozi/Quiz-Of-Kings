@@ -1,13 +1,15 @@
 from django.core.validators import MaxValueValidator
 from django.db import models
+from django.db.models import Count, Sum
 from django.utils.translation import gettext_lazy as _
+from rest_framework.response import Response
 
 from accounts.models import Player, Admin
 
 
 class Category(models.Model):
     name = models.CharField(max_length=25, verbose_name=_('category'))
-    is_active = models.BooleanField(verbose_name=_('is active'))
+    is_active = models.BooleanField(verbose_name=_('is active'), default=True)
 
     class Meta:
         verbose_name = _('Category')
@@ -40,6 +42,24 @@ class Question(models.Model):
     def __str__(self):
         return self.text
 
+    def get_popular_choices(self):
+        choices = Choice.objects.filter(question_id=self.id).values('pk', 'chosen_count')
+        sum_count = choices.aggregate(s=Sum('chosen_count'))
+
+        if not choices:
+            response_data = {'detail': 'NOT found'}
+            return Response(response_data)
+
+        response = {'question_id': self.id}
+        for choice in choices:
+            if sum_count['s'] == 0:
+                percent = 0
+            else:
+                percent = round((choice['chosen_count'] / sum_count['s']) * 100, 2)
+            response[choice['pk']] = percent
+
+        return Response(response)
+
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='choices', verbose_name=_('question'))
@@ -70,11 +90,11 @@ class Match(models.Model):
     starter_player_score = models.PositiveIntegerField(default=0, verbose_name=_('starter player score'))
     joining_player_score = models.PositiveIntegerField(default=0, verbose_name=_('joining player score'))
     selected_categories = models.ManyToManyField(Category, blank=True, verbose_name=_('selected categories'))
-    status = models.CharField(max_length=15, choices=STATUSES, verbose_name=_('status'))
+    status = models.CharField(max_length=15, choices=STATUSES, verbose_name=_('status'), blank=False, null=False)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('creation time'))
     modified_at = models.DateTimeField(verbose_name=_('last modification'), blank=True, null=True)
     turn = models.CharField(max_length=10, choices=TURNS, default='S', verbose_name=_('turn'))
-    expires_at = models.DateTimeField(verbose_name=_('expected expiring date'))
+    expires_at = models.DateTimeField(verbose_name=_('expected expiring date'), blank=True, null=True)
     rounds_played = models.PositiveIntegerField(default=0, verbose_name=_('round_played'),
                                                 validators=[MaxValueValidator(6)])
 
@@ -83,7 +103,10 @@ class Match(models.Model):
         verbose_name_plural = _('Matches')
 
     def __str__(self):
-        return f'{self.starter_player.user.username} vs {self.joining_player.user.username} at {self.created_at}'
+        if self.joining_player is None:
+            return f'{self.starter_player.user.username} vs blank-user at {self.created_at}'
+        else:
+            return f'{self.starter_player.user.username} vs {self.joining_player.user.username} at {self.created_at}'
 
 
 class PlayerAnswer(models.Model):
