@@ -32,6 +32,7 @@ class Question(models.Model):
     confirmed_at = models.DateField(verbose_name=_('confirmation date'), blank=True, null=True)
     likes = models.PositiveIntegerField(default=0, verbose_name=_('likes'))
     dislikes = models.PositiveIntegerField(default=0, verbose_name=_('dislikes'))
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = _('Question')

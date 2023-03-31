@@ -37,3 +37,21 @@ class Report(models.Model):
 
     def __str__(self):
         return f'{self.user.user.username} - {self.question.text}'
+
+
+class LikeOrDislike(models.Model):
+    TYPE = (('L', 'like'),
+            ('D', 'dislike'))
+
+    user = models.ForeignKey(Player, on_delete=models.PROTECT, related_name='like_dislike',
+                             verbose_name=_('like / dislike'))
+    type = models.CharField(choices=TYPE, max_length=2, verbose_name=_('type'), blank='L')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='like_dislike',
+                                 verbose_name=_('question'))
+
+    class Meta:
+        verbose_name = _('Like Or Dislike')
+        verbose_name_plural = _('Likes Or Dislikes')
+
+    def __str__(self):
+        return f'{self.user.user.username} - {self.question.text} - {self.type}'
