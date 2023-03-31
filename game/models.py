@@ -84,7 +84,10 @@ class Match(models.Model):
         verbose_name_plural = _('Matches')
 
     def __str__(self):
-        return f'{self.starter_player.user.username} vs {self.joining_player.user.username} at {self.created_at}'
+        if self.joining_player:
+            return f'{self.starter_player.user.username} vs {self.joining_player.user.username} at {self.created_at.date()}'
+        else:
+            return f'{self.starter_player.user.username} vs - at {self.created_at.date()}'
 
 
 class PlayerAnswer(models.Model):
@@ -101,6 +104,6 @@ class PlayerAnswer(models.Model):
 
     def __str__(self):
         if self.player == self.match.starter_player:
-            return f'{self.player.user.username} - «{self.question.text}» : «{self.answer.text}» in match vs {self.match.joining_player} at «{self.match.created_at}»'
+            return f'{self.player.user.username} - «{self.question.text}» : «{self.answer.text}» in match vs {self.match.joining_player} at «{self.match.created_at.date()}»'
         else:
-            return f'{self.player.user.username} - «{self.question.text}» : «{self.answer.text}» in match vs {self.match.starter_player} at «{self.match.created_at}»'
+            return f'{self.player.user.username} - «{self.question.text}» : «{self.answer.text}» in match vs {self.match.starter_player} at «{self.match.created_at.date()}»'
