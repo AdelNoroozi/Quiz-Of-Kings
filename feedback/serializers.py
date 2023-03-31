@@ -3,7 +3,7 @@ from .models import LikeOrDislike
 
 
 class LikeOrDislikeSerializer(serializers.Serializer):
-    user = serializers.CharField(source='user.user.username')
+    user = serializers.CharField(source='user.user.username', read_only=True)
 
     class Meta:
         model = LikeOrDislike
